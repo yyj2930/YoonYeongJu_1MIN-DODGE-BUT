@@ -20,13 +20,13 @@ public class Bullet : MonoBehaviour
         bulletRigidbody.velocity = speed * transform.forward;
         curSpeed = speed;
 
-        bounceNum = Random.Range(bounceMin, bounceMax);
+        bounceNum = Random.Range(bounceMin, bounceMax);                             // 튕기는 횟수 랜덤
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(gameObject.tag == "BOUNCYBULLET")
+        if(gameObject.tag == "BOUNCYBULLET")                                        // 튕기는 횟수 소모 시 자동 제거
         {
             if(bounceNum < 0)
             {
@@ -35,34 +35,39 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if(gameObject.tag == "NORMALBULLET")
+        if(gameObject.tag == "NORMALBULLET" && collision.gameObject.tag == "WALL")  // 일반 탄환 처리
         {
-            if (other.tag == "WALL")
+            if (collision.gameObject.tag == "WALL")
             {
                 Destroy(gameObject);
             }
         }
-        if(gameObject.tag == "BOUNCYBULLET")
+        else if(gameObject.tag == "BOUNCYBULLET" && collision.gameObject.tag == "WALL")     // 튕기는 탄환 처리
         {
-            if(other.tag == "WALL" && curSpeed >= 0)
-            {
-                bulletRigidbody.velocity = -speed * transform.forward;
-                curSpeed = -speed;
-                bounceNum--;
-            }
-            else if(other.tag == "WALL" && curSpeed <= 0)
-            {
-                bulletRigidbody.velocity = speed * transform.forward;
-                curSpeed = speed;
-                bounceNum--;
-            }
+            Vector3 incident = bulletRigidbody.velocity.normalized;                    // 튕기기 전의 벡터
+            Vector3 normal = collision.contacts[0].normal;                             // 충돌 지점 법선 벡터
+            Vector3 reflect = Vector3.Reflect(incident, normal);                       // 튕긴 후의 벡터
+                
+            bulletRigidbody.velocity = reflect * curSpeed;                             // 반사 방향으로 속도 설정
+            bulletRigidbody.MovePosition(transform.position + reflect * Time.fixedDeltaTime * curSpeed); // 강제 이동
+            bounceNum--;
+
+            curSpeed = speed;
+            
+            /*  벽과 충돌 시 확인용
+            Vector3 contactPoint = collision.contacts[0].point; 
+            Debug.Log($"Incident: {incident}, Normal: {normal}, Reflect: {reflect}");   
+            Debug.DrawRay(contactPoint, incident * 5f, Color.blue, 5f);                 // 입사 방향 (파랑)
+            Debug.DrawRay(contactPoint, normal * 5f, Color.red, 5f);                    // 법선 (빨강)
+            Debug.DrawRay(contactPoint, reflect * 5f, Color.green, 5f);                 // 반사 방향 (초록)
+            */
         }
 
-        if(gameObject.tag == "Player")
+        if(collision.gameObject.tag == "Player")
         {
-            other.GetComponent<Player>().Die();
+            collision.gameObject.GetComponent<Player>().Die();
             Destroy(gameObject);
         }
     }
