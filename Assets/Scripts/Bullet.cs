@@ -67,8 +67,12 @@ public class Bullet : MonoBehaviour
 
         if(collision.gameObject.tag == "Player")
         {
-            collision.gameObject.GetComponent<Player>().Die();
-            Destroy(gameObject);
+            Player player = collision.gameObject.GetComponent<Player>();
+            if(player != null && !player.isDash)
+            {
+                player.Die();
+                Destroy(gameObject);
+            }
         }
     }
 }
