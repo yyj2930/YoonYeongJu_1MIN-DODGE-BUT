@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     private Vector3 dashDirection;
     private Collider playerCollider;
     private float lashDashTime;
+    public bool isDead;
 
     private bool isWalking = false;
     private bool isRolling = false;
@@ -30,6 +31,7 @@ public class Player : MonoBehaviour
         playerCollider = GetComponent<Collider>();
         isDash = false;
         lashDashTime = -dashCooldown;                                         // 초기값 설정
+        isDead = false;
 
         animator = GetComponentInChildren<Animator>();
     }
@@ -59,7 +61,7 @@ public class Player : MonoBehaviour
         isWalking = Mathf.Abs(xInput) > 0f || Mathf.Abs(zInput) > 0f;
         animator.SetBool("Walk_Anim", isWalking);
 
-        if (Input.GetKeyDown(KeyCode.Space) && !isDash && Time.time - lashDashTime >= dashCooldown)
+       if (Input.GetKeyDown(KeyCode.Space) && !isDash && Time.time - lashDashTime >= dashCooldown)
         {
             Dash();
         }
@@ -122,6 +124,7 @@ public class Player : MonoBehaviour
     {
         if (!isDash)
         {
+            isDead = true;
             gameObject.SetActive(false);
         }       
     }
