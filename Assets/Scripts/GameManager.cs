@@ -13,10 +13,14 @@ public class GameManger : MonoBehaviour
     public GameObject clearText;
     public GameObject failText;
 
+    private Player player;
+
     // Start is called before the first frame update
     void Start()
     {
         time = 60f;    
+
+        player = GameObject.FindObjectOfType<Player>();
     }
 
     // Update is called once per frame
@@ -24,8 +28,6 @@ public class GameManger : MonoBehaviour
     {
         time -= Time.deltaTime;
         timeText.text = "" + (int)time;
-
-        Player player = gameObject.GetComponent<Player>();
 
         if (time <= 0f)
         {
@@ -38,7 +40,7 @@ public class GameManger : MonoBehaviour
             }
         }
 
-        if (player.isDead == true)
+        if (player.isDead && player != null)
         {
             failText.SetActive(true);
             timer.SetActive(false);
