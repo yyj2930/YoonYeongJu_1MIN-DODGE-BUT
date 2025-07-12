@@ -12,6 +12,7 @@ public class RandomSpawner : MonoBehaviour
     private float timeElapsed = 0f;
     private bool isSpawning = false;
 
+    private List<GameObject> spawnedObjects = new List<GameObject>();                           // 소환된 객체를 추적
 
     // Start is called before the first frame update
     void Start()
@@ -28,6 +29,7 @@ public class RandomSpawner : MonoBehaviour
             if (timeElapsed >= totalDuration)
             {
                 isSpawning = false;
+                ClearSpawnedObjects();                                                          // 시간 종료 시 소환된 객체 제거
             }
 
         }
@@ -45,7 +47,7 @@ public class RandomSpawner : MonoBehaviour
                 int randomIndex = Random.Range(0, patterns.Length);
                 GameObject patternToSpawn = patterns[randomIndex];
 
-                Instantiate(patternToSpawn, transform.position, Quaternion.identity);
+                Instantiate(patternToSpawn, transform.position, transform.rotation);
             }
 
             yield return new WaitForSeconds(spawnInterval);                                     // 5초 대기
@@ -55,5 +57,17 @@ public class RandomSpawner : MonoBehaviour
                 break;
             }
         }
+    }
+
+    private void ClearSpawnedObjects()
+    {
+        foreach (GameObject obj in spawnedObjects)
+        {
+            if (obj != null)
+            {
+                Destroy(obj);                                                                   // 소환된 객체 제거
+}
+        }
+        spawnedObjects.Clear();                                                                 // 리스트 비우기
     }
 }
