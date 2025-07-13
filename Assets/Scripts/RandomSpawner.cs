@@ -11,13 +11,20 @@ public class RandomSpawner : MonoBehaviour
 
     private float timeElapsed = 0f;
     private bool isSpawning = false;
+    private bool isInitialized = false;                                                         // 초기화 상태 추가
 
     private List<GameObject> spawnedObjects = new List<GameObject>();                           // 소환된 객체를 추적
+
+    void Awake()
+    {
+        // 초기에는 비활성화 상태로 시작
+        enabled = false; // 스크립트 비활성화
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(SpawnRoutine());    
+        
     }
 
     // Update is called once per frame
@@ -32,6 +39,16 @@ public class RandomSpawner : MonoBehaviour
                 ClearSpawnedObjects();                                                          // 시간 종료 시 소환된 객체 제거
             }
 
+        }
+    }
+
+   public void InitializeSpawner()                                                              // 외부에서 수동으로 초기화
+    {
+        if (!isInitialized)
+        {
+            isInitialized = true;
+            enabled = true;                                                                     // 스크립트 활성화
+            StartCoroutine(SpawnRoutine());
         }
     }
 

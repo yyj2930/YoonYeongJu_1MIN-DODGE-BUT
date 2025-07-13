@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //PlayerPrefs.DeleteAll();
+
         playerRigidbody = GetComponent<Rigidbody>();
         playerCollider = GetComponent<Collider>();
         isDash = false;
@@ -34,6 +37,11 @@ public class Player : MonoBehaviour
         isDead = false;
 
         animator = GetComponentInChildren<Animator>();
+
+        if (SceneManager.GetActiveScene().name == "Lobby")
+        {
+            LoadPosition();
+        }
     }
 
     // Update is called once per frame
@@ -64,6 +72,11 @@ public class Player : MonoBehaviour
        if (Input.GetKeyDown(KeyCode.Space) && !isDash && Time.time - lashDashTime >= dashCooldown)
         {
             Dash();
+        }
+
+       if (SceneManager.GetActiveScene().name == "Lobby" && newVelocity.magnitude > 0f)
+        {
+            SavePosition();
         }
     }
 
@@ -127,5 +140,24 @@ public class Player : MonoBehaviour
             isDead = true;
             gameObject.SetActive(false);
         }       
+    }
+
+    private void SavePosition()
+    {
+        PlayerPrefs.SetFloat("PlayerX", transform.position.x);
+        PlayerPrefs.SetFloat("PlayerY", transform.position.y);
+        PlayerPrefs.SetFloat("PlayerZ", transform.position.z);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadPosition()
+    {
+        if (PlayerPrefs.HasKey("PlayerX"))
+        {
+            float x = PlayerPrefs.GetFloat("PlayerX");
+            float y = PlayerPrefs.GetFloat("PlayerY");
+            float z = PlayerPrefs.GetFloat("PlayerZ");
+            transform.position = new Vector3(x, y, z);
+        }
     }
 }
