@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,6 +7,7 @@ public class Player : MonoBehaviour
 {
     private Rigidbody playerRigidbody;
     private Animator animator;
+    private AudioSource audioSource;
 
     public float speed;
 
@@ -34,16 +34,19 @@ public class Player : MonoBehaviour
     private float positionSaveTime;
     public float positionSaveInterval = 5f;
 
+    public AudioClip dashSound;
+
     // Start is called before the first frame update
     private void Awake()
     {
-        PlayerPrefs.DeleteAll();
+        //PlayerPrefs.DeleteAll();
     }
 
     void Start()
     {
         playerRigidbody = GetComponent<Rigidbody>();
         playerCollider = GetComponent<Collider>();
+        audioSource = GetComponent<AudioSource>();
         isDash = false;
         lastDashTime = -dashCooldown;                                         // 초기값 설정
         isDead = false;
@@ -104,6 +107,8 @@ public class Player : MonoBehaviour
 
     private void Dash()
     {
+        audioSource.PlayOneShot(dashSound);
+
         float xInput = Input.GetAxisRaw("Horizontal");
         float zInput = Input.GetAxisRaw("Vertical");
         dashDirection = new Vector3(xInput, 0f, zInput).normalized;         // 방향 추출

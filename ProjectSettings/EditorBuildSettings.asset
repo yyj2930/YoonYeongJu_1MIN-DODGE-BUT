@@ -20,4 +20,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/StageBouncy.unity
     guid: 7f70fe6343ddb92418c6107eeea1b2e6
+  - enabled: 1
+    path: Assets/StageMultishot.unity
+    guid: 5b9628db4b803dd4aaa32f911d6d7322
+  - enabled: 1
+    path: Assets/StageSpinningshot.unity
+    guid: 181c89c62e147414fb105bb5b1d6071a
   m_configObjects: {}
