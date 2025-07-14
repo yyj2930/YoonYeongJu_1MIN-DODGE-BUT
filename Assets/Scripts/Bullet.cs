@@ -44,7 +44,7 @@ public class Bullet : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        else if(gameObject.tag == "BOUNCYBULLET" && collision.gameObject.tag == "WALL")     // Æ¨±â´Â ÅºÈ¯ Ã³¸®
+        else if(gameObject.tag == "BOUNCYBULLET" && collision.gameObject.tag == "BOUNCYWALL")     // Æ¨±â´Â ÅºÈ¯ Ã³¸®
         {
             Vector3 incident = bulletRigidbody.velocity.normalized;                    // Æ¨±â±â ÀüÀÇ º¤ÅÍ
             Vector3 normal = collision.contacts[0].normal;                             // Ãæµ¹ ÁöÁ¡ ¹ý¼± º¤ÅÍ

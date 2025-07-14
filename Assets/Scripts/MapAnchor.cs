@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapAnchor : MonoBehaviour
+public class MapAnchor : MonoBehaviour                                      // 미사용 결정
 {
     public float mapBoundary = 10f;                                         // 맵 경계 반경 
     public LayerMask targetLayer;                                           // 경계를 적용할 레이어

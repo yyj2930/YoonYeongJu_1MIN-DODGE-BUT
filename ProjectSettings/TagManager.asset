@@ -7,6 +7,9 @@ TagManager:
   - WALL
   - NORMALBULLET
   - BOUNCYBULLET
+  - GROUND
+  - AIR
+  - BOUNCYWALL
   layers:
   - Default
   - TransparentFX

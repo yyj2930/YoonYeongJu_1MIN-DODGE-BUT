@@ -17,23 +17,35 @@ public class Player : MonoBehaviour
     public bool isDash;
     private Vector3 dashDirection;
     private Collider playerCollider;
-    private float lashDashTime;
+    private float lastDashTime;
     public bool isDead;
+
+    public float fallThreshold = -10f;
 
     private bool isWalking = false;
     private bool isRolling = false;
+    private bool isGrounded = false;
 
     public float rotationSpeed = 10f;
-    
+
+    private Vector3 initialLobbyPosition = new Vector3(0f, 80f, 0f);
+
+    private Vector3 lastPosition;
+    private float positionSaveTime;
+    public float positionSaveInterval = 5f;
+
     // Start is called before the first frame update
+    private void Awake()
+    {
+        PlayerPrefs.DeleteAll();
+    }
+
     void Start()
     {
-        //PlayerPrefs.DeleteAll();
-
         playerRigidbody = GetComponent<Rigidbody>();
         playerCollider = GetComponent<Collider>();
         isDash = false;
-        lashDashTime = -dashCooldown;                                         // 초기값 설정
+        lastDashTime = -dashCooldown;                                         // 초기값 설정
         isDead = false;
 
         animator = GetComponentInChildren<Animator>();
@@ -41,6 +53,12 @@ public class Player : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "Lobby")
         {
             LoadPosition();
+            if (!PlayerPrefs.HasKey("PlayerX"))
+            {
+                transform.position = initialLobbyPosition;
+            }
+            lastPosition = transform.position;                                // 초기 위치 저장
+            positionSaveTime = Time.time;
         }
     }
 
@@ -58,7 +76,8 @@ public class Player : MonoBehaviour
         float xSpeed = xInput * speed;
         float zSpeed = zInput * speed;
 
-        Vector3 newVelocity = new Vector3(xSpeed, 0f, zSpeed);
+        float yVelocity = isGrounded ? 0f : playerRigidbody.velocity.y;
+        Vector3 newVelocity = new Vector3 (xSpeed, yVelocity, zSpeed);
         playerRigidbody.velocity = newVelocity;
 
         if (newVelocity.magnitude > 0f)
@@ -69,7 +88,7 @@ public class Player : MonoBehaviour
         isWalking = Mathf.Abs(xInput) > 0f || Mathf.Abs(zInput) > 0f;
         animator.SetBool("Walk_Anim", isWalking);
 
-       if (Input.GetKeyDown(KeyCode.Space) && !isDash && Time.time - lashDashTime >= dashCooldown)
+       if (Input.GetKeyDown(KeyCode.Space) && !isDash && Time.time - lastDashTime >= dashCooldown)
         {
             Dash();
         }
@@ -77,7 +96,10 @@ public class Player : MonoBehaviour
        if (SceneManager.GetActiveScene().name == "Lobby" && newVelocity.magnitude > 0f)
         {
             SavePosition();
+            SaveLastPosition();
         }
+
+        CheckFall();
     }
 
     private void Dash()
@@ -95,7 +117,7 @@ public class Player : MonoBehaviour
         playerCollider.enabled = false;
         isRolling = true;
 
-        lashDashTime = Time.time;                                           // 쿨타임 시작 시각 기록
+        lastDashTime = Time.time;                                           // 쿨타임 시작 시각 기록
 
         animator.SetBool("Roll_Anim", isRolling);
 
@@ -137,9 +159,26 @@ public class Player : MonoBehaviour
     {
         if (!isDash)
         {
-            isDead = true;
-            gameObject.SetActive(false);
+            if(SceneManager.GetActiveScene().name == "Lobby")
+            {
+                transform.position = lastPosition;  
+                isDead = false;
+            }
+            else
+            {
+                isDead = true;
+                gameObject.SetActive(false);
+            }
         }       
+    }
+
+    private void SaveLastPosition()
+    {
+        if (isGrounded && Time.time - positionSaveTime >= positionSaveInterval) 
+        {
+            lastPosition = transform.position;
+            positionSaveTime = Time.time;
+        }
     }
 
     private void SavePosition()
@@ -158,6 +197,38 @@ public class Player : MonoBehaviour
             float y = PlayerPrefs.GetFloat("PlayerY");
             float z = PlayerPrefs.GetFloat("PlayerZ");
             transform.position = new Vector3(x, y, z);
+        }
+    }
+
+    private void CheckFall()
+    {
+        if (transform.position.y < fallThreshold)
+        {
+            Die();                                              // y축이 fallThreshold 아래로 떨어지면 추락 처리
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("GROUND"))
+        {
+            isGrounded = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("GROUND"))
+        {
+            isGrounded = false;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "AIR")
+        {
+            isGrounded = false;
         }
     }
 }

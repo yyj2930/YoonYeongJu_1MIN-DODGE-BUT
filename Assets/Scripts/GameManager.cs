@@ -26,6 +26,13 @@ public class GameManger : MonoBehaviour
     private List<GameObject> deactivatedObjects = new List<GameObject>();      // 비활성화된 오브젝트 추적
     private bool isPaused = true;                                              // 시간 멈춤 상태 플래그 (초기값 true)
 
+    public string currentSceneName;
+
+    void Awake()
+    {
+        
+    }
+
     void Start()
     {
         isClear = false;
@@ -71,7 +78,7 @@ public class GameManger : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene("Stage1");
+                SceneManager.LoadScene(currentSceneName);
             }
         }
     }
